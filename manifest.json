@@ -1,0 +1,8 @@
+{
+  "name": "Where We Going Then?",
+  "short_name": "Where We Going Then?",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f3f4f6",
+  "theme_color": "#172033"
+}
