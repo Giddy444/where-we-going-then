@@ -16,7 +16,58 @@ const places=[
 ['Red Lion','Thetford','pub',52.4127,.7495,4.2,4.3,['realale'],'Real ale','Red Lion Wetherspoon Thetford pub'],['Black Horse','Thetford','pub',52.4137,.7468,4.5,4.4,['realale'],'Real ale','Black Horse Thetford pub'],['Dolphin Inn','Thetford','pub',52.4147,.7460,4.5,4.3,['historic','realale'],'Real ale','Dolphin Inn Thetford pub'],['Albion','Thetford','pub',52.4161,.7485,4.4,4.2,['realale'],'Real ale','Albion Thetford pub'],['The Riverside Kiosk','Thetford','cafe',52.4148,.7523,3,4.8,['coffee','food'],'Coffee','The Riverside Kiosk Thetford'],["Mama D's",'Thetford','cafe',52.4140,.7476,4,4.8,['coffee','food'],'Coffee',"Mama D's Thetford cafe"],['Tall Orders Coffee Shop','Thetford','cafe',52.4131,.7479,3.5,4.5,['coffee'],'Coffee','Tall Orders Coffee Shop Thetford']
 ].map(x=>({name:x[0],city:x[1],type:x[2],lat:x[3],lng:x[4],price:x[5],rating:x[6],tags:x[7],item:x[8],search:x[9]}));
 const centers={Cambridge:[52.205,.122],Norwich:[52.630,1.296],Thetford:[52.414,.749]};let city='Cambridge',mode='drink',filter='cheap',markers=[],userPos=null,photos={};let map=L.map('map').setView(centers.Cambridge,15);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors'}).addTo(map);
-function goHome(){document.getElementById('cities').style.display='none';document.getElementById('start').style.display='flex';window.scrollTo(0,0)}function chooseMode(m){mode=m;document.getElementById('start').style.display='none';document.getElementById('cities').style.display='flex'}function backStart(){document.getElementById('cities').style.display='none';document.getElementById('start').style.display='flex'}function chooseCity(c){city=c;document.getElementById('cities').style.display='none';document.getElementById('sub').textContent=`${c} • ${mode==='drink'?'pubs • pints • real ale':'coffee • 0.0% • food • somewhere nice'}`;document.getElementById('drinkBtn').classList.toggle('active',mode==='drink');document.getElementById('nodrinkBtn').classList.toggle('active',mode==='nodrink');document.getElementById('crawlBtn').style.display=mode==='drink'?'inline-block':'none';map.setView(centers[c],15);render()}function randomMode(){document.getElementById('wheelScreen').style.display='flex';document.getElementById('wheelResult').textContent='';document.getElementById('wheel').style.transform='rotate(0deg')} function closeWheel(){document.getElementById('wheelScreen').style.display='none'} function doWheelSpin(){const options=[['Cambridge','drink'],['Cambridge','nodrink'],['Norwich','drink'],['Norwich','nodrink'],['Thetford','drink'],['Thetford','nodrink']];const idx=Math.floor(Math.random()*options.length),pick=options[idx],cityPick=pick[0],modePick=pick[1],extra=1800+idx*60;document.getElementById('wheel').style.transform=`rotate(${extra}deg)`;setTimeout(()=>{city=cityPick;mode=modePick;document.getElementById('wheelResult').textContent=`${modePick==='drink'?'🍺':'🥤'} ${cityPick} — ${modePick==='drink'?'I’m drinking!':'I’m not drinking!'}`;setTimeout(()=>{closeWheel();chooseCity(cityPick)},900)},2300)} function spinWheel(){mode=Math.random()<.5?'drink':'nodrink';document.getElementById('sub').textContent=`${city} • 🎡 ${mode==='drink'?'The wheel says: drinking!':'The wheel says: no pint today!'}`;document.getElementById('drinkBtn').classList.toggle('active',mode==='drink');document.getElementById('nodrinkBtn').classList.toggle('active',mode==='nodrink');document.getElementById('crawlBtn').style.display=mode==='drink'?'inline-block':'none';render();alert(mode==='drink'?'🎡 The wheel says: GO FOR A DRINK!':'🎡 The wheel says: NO PINT TODAY — find coffee, food or somewhere nice!')}
+function goHome(){
+  document.getElementById('cities').style.display='none';
+  document.getElementById('wheelScreen').style.display='none';
+  document.getElementById('start').style.display='flex';
+  window.scrollTo(0,0);
+}
+function chooseMode(m){
+  mode=m;
+  document.getElementById('start').style.display='none';
+  document.getElementById('cities').style.display='flex';
+}
+function backStart(){
+  document.getElementById('cities').style.display='none';
+  document.getElementById('start').style.display='flex';
+}
+function chooseCity(c){
+  city=c;
+  document.getElementById('cities').style.display='none';
+  document.getElementById('sub').textContent=c+' • '+(mode==='drink'?'pubs • pints • real ale':'coffee • 0.0% • food • somewhere nice');
+  document.getElementById('drinkBtn').classList.toggle('active',mode==='drink');
+  document.getElementById('nodrinkBtn').classList.toggle('active',mode==='nodrink');
+  document.getElementById('crawlBtn').style.display=mode==='drink'?'inline-block':'none';
+  map.setView(centers[c],15);
+  render();
+}
+function randomMode(){
+  document.getElementById('wheelScreen').style.display='flex';
+  document.getElementById('wheelResult').textContent='';
+  document.getElementById('wheel').style.transform='rotate(0deg)';
+}
+function closeWheel(){document.getElementById('wheelScreen').style.display='none'}
+function doWheelSpin(){
+  const options=[['Cambridge','drink'],['Cambridge','nodrink'],['Norwich','drink'],['Norwich','nodrink'],['Thetford','drink'],['Thetford','nodrink']];
+  const idx=Math.floor(Math.random()*options.length);
+  const pick=options[idx];
+  const cityPick=pick[0];
+  const modePick=pick[1];
+  const extra=1800+idx*60;
+  document.getElementById('wheel').style.transform='rotate('+extra+'deg)';
+  setTimeout(function(){
+    city=cityPick;
+    mode=modePick;
+    document.getElementById('wheelResult').textContent=(modePick==='drink'?'🍺 ':'🥤 ')+cityPick+' — '+(modePick==='drink'?'I’m drinking!':'I’m not drinking!');
+    setTimeout(function(){
+      closeWheel();
+      chooseCity(cityPick);
+    },900);
+  },2300);
+}
+function spinWheel(){
+  randomMode();
+}
 function setMode(m,b){mode=m;document.querySelectorAll('.controls button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById('sub').textContent=`${city} • ${mode==='drink'?'pubs • pints • real ale':'coffee • 0.0% • food • somewhere nice'}`;document.getElementById('crawlBtn').style.display=mode==='drink'?'inline-block':'none';render()}function setFilter(f,b){filter=f;document.querySelectorAll('.controls button').forEach(x=>x.classList.remove('active'));b.classList.add('active');render()}
 function data(){let a=places.filter(p=>p.city===city&&p.type===(mode==='drink'?'pub':'cafe'));if(filter==='historic')a=a.filter(p=>p.tags.includes('historic'));if(filter==='realale')a=a.filter(p=>p.tags.includes('realale'));if(userPos)a.forEach(p=>p.distance=dist(userPos.lat,userPos.lng,p.lat,p.lng));a.sort((x,y)=>filter==='cheap'?x.price-y.price:(userPos?x.distance-y.distance:y.rating-x.rating));return a}function dist(a,b,c,d){const R=6371,x=(c-a)*Math.PI/180,y=(d-b)*Math.PI/180,q=Math.sin(x/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(y/2)**2;return 2*R*Math.asin(Math.sqrt(q))}
 async function getPhotos(p){if(photos[p.name])return photos[p.name];try{let u='https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch='+encodeURIComponent(p.search)+'&gsrnamespace=6&gsrlimit=2&prop=imageinfo&iiprop=url&iiurlwidth=700&format=json&origin=*';let d=await (await fetch(u)).json();photos[p.name]=Object.values(d.query?.pages||{}).map(x=>x.imageinfo?.[0]?.thumburl).filter(Boolean).slice(0,2)}catch(e){photos[p.name]=[]}return photos[p.name]}
